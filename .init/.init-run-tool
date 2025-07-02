@@ -1,0 +1,4 @@
+{
+    "command": "CI=true PORT=<port> HOST=<host> npm run dev",
+    "working_directory": "/home/kavia/workspace/code-generation/fitrecord-personalized-workout--proofcapture-90535-8b0ad6e3/fitness_backend"
+}
