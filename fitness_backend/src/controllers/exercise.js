@@ -24,17 +24,19 @@ async function suggestExercise(req, res) {
     console.error('Missing weight or height in request body:', req.body);
     return res.status(400).json({ message: 'weight and height required' });
   }
-  if (
-    (typeof weight !== 'number' && typeof weight !== 'string') ||
-    (typeof height !== 'number' && typeof height !== 'string') ||
-    isNaN(weight) ||
-    isNaN(height)
-  ) {
+  // Accept numbers or strings that parse to numbers, reject anything else
+  const parsedWeight = typeof weight === 'string' || typeof weight === 'number' ? Number(weight) : NaN;
+  const parsedHeight = typeof height === 'string' || typeof height === 'number' ? Number(height) : NaN;
+  if (isNaN(parsedWeight) || isNaN(parsedHeight)) {
     console.error('Bad types for weight/height:', weight, height);
     return res.status(400).json({ message: 'weight and height must be numeric' });
   }
+  if (parsedWeight <= 0 || parsedHeight <= 0) {
+    console.error('Non-positive weight or height:', parsedWeight, parsedHeight);
+    return res.status(400).json({ message: 'weight and height must be positive numbers' });
+  }
   try {
-    const info = exerciseService.suggestRoutine(Number(weight), Number(height));
+    const info = exerciseService.suggestRoutine(parsedWeight, parsedHeight);
     console.log('suggestRoutine returned:', info);
     res.json(info);
   } catch (err) {
