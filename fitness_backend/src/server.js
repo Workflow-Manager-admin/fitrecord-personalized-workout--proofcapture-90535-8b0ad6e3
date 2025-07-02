@@ -1,3 +1,5 @@
+require('dotenv').config(); // Load environment variables from .env
+
 const app = require('./app');
 const { sequelize } = require('./models');
 
