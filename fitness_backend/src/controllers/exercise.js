@@ -13,20 +13,30 @@ async function suggestExercise(req, res) {
     return res.status(401).json({ message: 'Unauthorized - user not found in JWT.' });
   }
   const { weight, height } = req.body || {};
-  // Log request for debugging
+  // Enhanced debugging for integration: output full request context and check payload keys
   console.log('/exercise/suggest called by user:', req.user, 'Payload:', req.body);
+
+  // If payload keys are missing, log what keys were sent
+  if (!('weight' in req.body) || !('height' in req.body)) {
+    console.error('Payload missing required keys. Received keys:', Object.keys(req.body));
+  }
 
   // Type/geeky check: log types too
   console.debug('typeof weight:', typeof weight, 'typeof height:', typeof height);
 
-  if (weight === undefined || height === undefined) {
-    // Use loose check to catch 0 as valid input
+  // Explicit null/undefined check for robust error reporting
+  if (weight === undefined || weight === null || height === undefined || height === null) {
     console.error('Missing weight or height in request body:', req.body);
     return res.status(400).json({ message: 'weight and height required' });
   }
+
   // Accept numbers or strings that parse to numbers, reject anything else
   const parsedWeight = typeof weight === 'string' || typeof weight === 'number' ? Number(weight) : NaN;
   const parsedHeight = typeof height === 'string' || typeof height === 'number' ? Number(height) : NaN;
+
+  // Log parsed values to assist frontend-backend integration debugging
+  console.debug('Parsed: weight =', parsedWeight, 'height =', parsedHeight);
+
   if (isNaN(parsedWeight) || isNaN(parsedHeight)) {
     console.error('Bad types for weight/height:', weight, height);
     return res.status(400).json({ message: 'weight and height must be numeric' });
