@@ -1,10 +1,10 @@
 const healthService = require('../services/health');
 
-class HealthController {
-  check(req, res) {
-    const healthStatus = healthService.getStatus();
-    return res.status(200).json(healthStatus);
-  }
+// PUBLIC_INTERFACE
+function check(req, res) {
+  /** Application health endpoint root (`/`). */
+  const healthStatus = healthService.getStatus();
+  res.status(200).json(healthStatus);
 }
 
-module.exports = new HealthController();
+module.exports = { check };

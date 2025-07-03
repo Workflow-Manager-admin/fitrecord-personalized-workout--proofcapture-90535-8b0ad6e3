@@ -1,21 +1,18 @@
 const { WorkoutSession } = require('../models');
-const path = require('path');
 
+// PUBLIC_INTERFACE
 class WorkoutService {
-  // PUBLIC_INTERFACE
   async logSession(userId, exercise, proofFilePath = null) {
-    /** Log a workout for a user, optionally storing proof file path. */
+    /** Log a workout for a user, file path optional. */
+    if (!exercise) throw new Error('Exercise is required');
     const session = await WorkoutSession.create({
-      userId,
-      exercise,
-      proofFile: proofFilePath || null
+      userId, exercise, proofFile: proofFilePath
     });
     return session;
   }
 
-  // PUBLIC_INTERFACE
-  async getHistory(userId, limit = 20) {
-    /** Get workout history (most recent first). */
+  async getHistory(userId, limit = 30) {
+    /** Up to 'limit' most recent sessions for user */
     return WorkoutSession.findAll({
       where: { userId },
       order: [['date', 'DESC']],
@@ -24,5 +21,4 @@ class WorkoutService {
     });
   }
 }
-
 module.exports = new WorkoutService();

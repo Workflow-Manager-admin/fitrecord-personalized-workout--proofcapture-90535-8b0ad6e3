@@ -1,4 +1,4 @@
-require('dotenv').config(); // Load environment variables from .env
+require('dotenv').config();
 
 const app = require('./app');
 const { sequelize } = require('./models');
@@ -6,30 +6,25 @@ const { sequelize } = require('./models');
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+// PUBLIC_INTERFACE
 async function startServer() {
   try {
-    // Always test DB authentication first.
     await sequelize.authenticate();
-    console.log('Database connection established');
-
-    // Then sync models
+    console.log('DB connected');
     await sequelize.sync();
-    console.log('Database synchronized');
+    console.log('DB synchronized');
+    const server = app.listen(PORT, HOST, () =>
+      console.log(`Fitness backend running at http://${HOST}:${PORT}`)
+    );
 
-    const server = app.listen(PORT, HOST, () => {
-      console.log(`Server running at http://${HOST}:${PORT}`);
-    });
-
-    // Graceful shutdown
     process.on('SIGTERM', () => {
-      console.log('SIGTERM signal received: closing HTTP server');
+      console.log('SIGTERM: closing HTTP server');
       server.close(() => {
-        console.log('HTTP server closed');
         process.exit(0);
       });
     });
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
+  } catch (err) {
+    console.error('Startup DB error:', err);
     process.exit(1);
   }
 }

@@ -1,4 +1,5 @@
 const cors = require('cors');
+const path = require('path');
 const express = require('express');
 const routes = require('./routes');
 const swaggerUi = require('swagger-ui-express');
@@ -13,6 +14,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Swagger docs UI with dynamic server setting
 app.use('/docs', swaggerUi.serve, (req, res, next) => {
   const dynamicSpec = {
     ...swaggerSpec,
@@ -25,19 +30,23 @@ app.use('/docs', swaggerUi.serve, (req, res, next) => {
   swaggerUi.setup(dynamicSpec)(req, res, next);
 });
 
-// Parse JSON request body
+// Parse incoming JSON request bodies
 app.use(express.json());
 
-// Mount routes
+// Parse form-data for file uploads in /workout/log - will be handled per-route with multer
+// (not using express.urlencoded globally due to API requirements)
+
+// Core API Routes
 app.use('/', routes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  // eslint-disable-line no-unused-vars
+  console.error('Server error:', err);
   res.status(500).json({
-    status: 'error',
-    message: 'Internal Server Error',
+    message: 'Internal Server Error'
   });
 });
 
 module.exports = app;
+

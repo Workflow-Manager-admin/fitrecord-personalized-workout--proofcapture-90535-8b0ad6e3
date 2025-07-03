@@ -2,14 +2,11 @@ const { sequelize } = require('../models');
 
 // PUBLIC_INTERFACE
 async function dbHealthCheck(req, res) {
-  /**
-   * Checks DB connection and real write/read on SQLite.
-   * GET /db/health
-   */
+  /** Database health check for DB connectivity, write & read accessibility. */
   try {
     await sequelize.authenticate();
     await sequelize.query('SELECT 1');
-    // Try a real write/read op: use SQLite temp table, ensures file is writable
+    // Write/read test on temp table
     await sequelize.query('CREATE TEMP TABLE IF NOT EXISTS tmp_healthcheck(val INTEGER);');
     await sequelize.query('DELETE FROM tmp_healthcheck;');
     await sequelize.query('INSERT INTO tmp_healthcheck(val) VALUES (42);');

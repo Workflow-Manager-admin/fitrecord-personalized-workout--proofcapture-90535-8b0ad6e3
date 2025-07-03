@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
+
 const JWT_SECRET = process.env.JWT_SECRET || 'myultrasecret';
 
 // PUBLIC_INTERFACE
 function authenticateToken(req, res, next) {
-  /** Middleware: verifies JWT, attaches userId to req.user. */
+  /** Verifies JWT and attaches user info to req.user. */
   const auth = req.headers['authorization'];
   const token = auth && auth.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'No token provided' });
