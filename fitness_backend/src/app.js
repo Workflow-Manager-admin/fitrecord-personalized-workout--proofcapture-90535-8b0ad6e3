@@ -17,7 +17,7 @@ app.use(cors({
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Swagger docs UI with dynamic server setting
+// Swagger UI endpoint at /docs (backward compatibility)
 app.use('/docs', swaggerUi.serve, (req, res, next) => {
   const dynamicSpec = {
     ...swaggerSpec,
@@ -28,6 +28,22 @@ app.use('/docs', swaggerUi.serve, (req, res, next) => {
     ],
   };
   swaggerUi.setup(dynamicSpec)(req, res, next);
+});
+
+// Swagger UI endpoint at /api-docs (as requested)
+app.use('/api-docs', swaggerUi.serve, (req, res, next) => {
+  const dynamicSpec = {
+    ...swaggerSpec,
+    servers: [
+      {
+        url: `${req.protocol}://${req.get('host')}`,
+      },
+    ],
+  };
+  swaggerUi.setup(dynamicSpec, {
+    customSiteTitle: 'Fitness App API Docs',
+    customfavIcon: '/uploads/favicon.ico'
+  })(req, res, next);
 });
 
 // Parse incoming JSON request bodies
